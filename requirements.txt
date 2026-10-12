@@ -1,0 +1,4 @@
+pyinstaller>=6.0
+plyer>=2.1
+openpyxl>=3.1
+Pillow>=10.0

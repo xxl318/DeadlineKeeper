@@ -1,0 +1,14 @@
+.venv/
+__pycache__/
+*.py[cod]
+build/
+dist/
+Output/
+*.log
+.claude/
+.env*
+tasks.json
+config.json
+archive.json
+pet.json
+*.broken.json
