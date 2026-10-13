@@ -1,0 +1,13 @@
+export const REPEATS=['无','每天','每周','每月','每年'];
+export function localDate(d=new Date()){return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}T${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;}
+export function nextDeadline(value,repeat,now=new Date()){
+ if(repeat==='无')return null;
+ let d=new Date(value);if(!Number.isFinite(+d)||!REPEATS.includes(repeat))throw Error('日期或重复规则无效');
+ let count=0;do{if(repeat==='每天')d.setDate(d.getDate()+1);else if(repeat==='每周')d.setDate(d.getDate()+7);else {const day=d.getDate();d.setDate(1);d.setMonth(d.getMonth()+(repeat==='每年'?12:1));const last=new Date(d.getFullYear(),d.getMonth()+1,0).getDate();d.setDate(Math.min(day,last));}if(++count>50000)throw Error('重复时间范围过大');}while(d<=now);return localDate(d);
+}
+export function validateBackup(data){
+ if(!data||data.version!==1||!Array.isArray(data.tasks)||!Array.isArray(data.archive)||data.tasks.length+data.archive.length>3000)throw Error('请选择 DeadlineKeeper 网页版导出的 JSON 备份（最多 3000 项）。');
+ const ids=new Set();return {version:1,tasks:check(data.tasks),archive:check(data.archive)};
+ function check(items){return items.map(t=>{if(!t||typeof t.id!=='string'||!t.id||ids.has(t.id)||typeof t.title!=='string'||!t.title.trim()||t.title.length>200||typeof t.done!=='boolean'||!['高','中','低'].includes(t.priority)||!REPEATS.includes(t.repeat)||typeof t.due!=='string'||!/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/.test(t.due)||(!Number.isFinite(+new Date(t.due))||localDate(new Date(t.due))!==t.due)||typeof t.notes!=='string'||t.notes.length>5000||!Array.isArray(t.subtasks)||t.subtasks.length>100)throw Error('备份中的任务字段不完整或格式不正确。');ids.add(t.id);const subtasks=t.subtasks.map(s=>{if(!s||typeof s.title!=='string'||!s.title.trim()||s.title.length>200||typeof s.done!=='boolean')throw Error('子任务格式不正确。');return {title:s.title,done:s.done};});return {id:t.id,title:t.title,done:subtasks.length?subtasks.every(s=>s.done):t.done,due:t.due,priority:t.priority,repeat:t.repeat,notes:t.notes,subtasks};});}
+}
+export function csv(tasks){const cell=v=>'"'+String(/^[=+@\-\t\r]/.test(String(v))?'\''+v:v).replaceAll('"','""')+'"';return '\uFEFF'+[['任务','截止日期','优先级','重复','状态','备注','子任务'],...tasks.map(t=>[t.title,t.due.replace('T',' '),t.priority,t.repeat,t.done?'已完成':'进行中',t.notes,t.subtasks.map(s=>(s.done?'[完成] ':'[待办] ')+s.title).join('; ')])].map(row=>row.map(cell).join(',')).join('\r\n');}
