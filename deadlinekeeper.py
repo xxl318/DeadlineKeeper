@@ -271,12 +271,12 @@ else:
 # 按钮文字字体（与全局保持一致）
 BUTTON_FAMILY = UI_FAMILY
 
-# 副标题“小琳专属Keeper”统一使用的粉色
+# 副标题“祝你一天好心情~”统一使用的粉色
 SUBTITLE_PINK = "#e6418a"
 
 # 大标题保持加粗；副标题：中文用行书（华文行楷），英文用艺术字（Monotype Corsiva）
 if SYSTEM == "Windows":
-    F_SUB_CN = ("华文行楷", 17)        # “小琳专属” —— 行书
+    F_SUB_CN = ("华文行楷", 17)        # “祝你一天好心情~” —— 行书
     F_SUB_EN = ("Monotype Corsiva", 20)  # “Keeper” —— 艺术字
 else:
     F_SUB_CN = (UI_FAMILY, 14)
@@ -3663,17 +3663,13 @@ class TodoApp(tk.Tk):
             font=F_HERO,
         ).pack(anchor="w")
 
-        # 副标题：中文“小琳专属”用行书，英文“Keeper”用艺术字，统一粉色
+        # 副标题：祝你一天好心情~，保持原有粉色及中文字体
         sub_row = tk.Frame(title_block, bg=C["bg"])
         sub_row.pack(anchor="w", pady=(4, 0))
         tk.Label(
-            sub_row, text="小琳专属", bg=C["bg"], fg=SUBTITLE_PINK,
+            sub_row, text="祝你一天好心情~", bg=C["bg"], fg=SUBTITLE_PINK,
             font=F_SUB_CN,
         ).pack(side="left", anchor="s")
-        tk.Label(
-            sub_row, text="Keeper", bg=C["bg"], fg=SUBTITLE_PINK,
-            font=F_SUB_EN,
-        ).pack(side="left", anchor="s", padx=(3, 0))
 
         picker = self._build_theme_picker(header)
         picker.pack(side="right", anchor="ne", pady=(10, 0))
